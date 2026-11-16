@@ -1,0 +1,4 @@
+const test=require('node:test'),a=require('node:assert/strict'),{profile,synthesize}=require('../voice.cjs');
+const cfg=url=>profile({url,model:'example',voice:'demo',key:''});
+test('only loopback accepts HTTP, URLs have no embedded credentials',()=>{a.throws(()=>cfg('http://example.org'));a.throws(()=>cfg('https://name:secret@example.org'));a.throws(()=>cfg('https://example.org/?key=x'));a.equal(cfg('http://localhost:8000').url,'http://localhost:8000/v1/audio/speech')});
+test('MP3 transport with optional key and no redirects',async()=>{const result=await synthesize(cfg('https://example.org/v1'),'你好',async(url,o)=>{a.equal(o.redirect,'error');a.equal(o.headers.Authorization,undefined);a.equal(JSON.parse(o.body).input,'你好');return new Response(Uint8Array.of(1,2,3))});a.deepEqual([...result],[1,2,3])});
