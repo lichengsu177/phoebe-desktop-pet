@@ -1,0 +1,31 @@
+name: Build desktop packages
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      matrix:
+        include:
+          - os: windows-2022
+            platform: win32
+            arch: x64
+          - os: macos-15
+            platform: darwin
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - run: npx --yes --package=@electron/packager@18.4.0 electron-packager . Phoebe --electron-version=45.0.0 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out=dist --ignore="^/.github" --ignore="^/.git$"
+      - if: runner.os == 'macOS'
+        run: ditto -c -k --keepParent dist/Phoebe-darwin-arm64/Phoebe.app Phoebe-mac-arm64.zip
+      - if: runner.os == 'Windows'
+        run: Compress-Archive -Path dist/Phoebe-win32-x64 -DestinationPath Phoebe-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Phoebe-${{ matrix.platform }}-${{ matrix.arch }}
+          path: '*.zip'
