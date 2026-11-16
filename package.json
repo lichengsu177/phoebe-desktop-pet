@@ -1,0 +1,14 @@
+{
+  "name": "phoebe-jiubi-desktop",
+  "version": "1.1.0",
+  "description": "菲比啾比 · Mac 桌面陪伴",
+  "main": "main.cjs",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "45.0.0"
+  }
+}
